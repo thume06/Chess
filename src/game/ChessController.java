@@ -12,7 +12,7 @@ import java.util.ResourceBundle;
 public class ChessController implements Initializable {
     private Main mainClass;
 
-    ImageView[][] chessBoard = new ImageView[8][8];
+    private ImageView[][] chessBoard = new ImageView[8][8];
 
     private final int rowMax = 8;
     private final int rowMin = 0;
@@ -23,11 +23,14 @@ public class ChessController implements Initializable {
 
     public void initialize(URL url, ResourceBundle rb) {
         mainClass = Main.getInstance();
-        InitializeImages();
+        InitializeBoard();
     }
 
-    public void InitializeImages(){
+    //Creates the board and places all of the pieces. Called in initialize method.
+    private void InitializeBoard(){
         int rowCount = 0;
+
+        //Loop creates the checker pattern on the board
         while(rowCount < rowMax){
             int columnCount = 0;
             while(columnCount < columnMax){
@@ -46,9 +49,42 @@ public class ChessController implements Initializable {
             }
             rowCount++;
         }
+
+        //Add white pieces
+        AddImage(0, 0, "wRook.png");
+        AddImage(0, 1, "wKnight.png");
+        AddImage(0, 2, "wBishop.png");
+        AddImage(0, 3, "wQueen.png");
+        AddImage(0, 4, "wKing.png");
+        AddImage(0, 5, "wBishop.png");
+        AddImage(0, 6, "wKnight.png");
+        AddImage(0, 7, "wRook.png");
+        int count = 0;
+        while(count < 8){
+            AddImage(1, count, "wPawn.png");
+            count++;
+        }
+
+        //Add black pieces
+        AddImage(7, 0, "bRook.png");
+        AddImage(7, 1, "bKnight.png");
+        AddImage(7, 2, "bBishop.png");
+        AddImage(7, 3, "bQueen.png");
+        AddImage(7, 4, "bKing.png");
+        AddImage(7, 5, "bBishop.png");
+        AddImage(7, 6, "bKnight.png");
+        AddImage(7, 7, "bRook.png");
+
+        count = 0;
+        while(count < 8){
+            AddImage(6, count, "bPawn.png");
+            count++;
+        }
+
     }
 
-    public void AddImage(int r, int c, String url){
+    //Method used to make adding an image simple. Just input row, column, and the image.
+    private void AddImage(int r, int c, String url){
         int rowCount = r;
         int columnCount = c;
 
@@ -82,7 +118,7 @@ public class ChessController implements Initializable {
         else if(r == 7){
             rowCount = 0;
         }
-        gamePane.add(chessBoard[r][c], rowCount, columnCount);
+        gamePane.add(chessBoard[r][c], columnCount, rowCount);
 
     }
 }
