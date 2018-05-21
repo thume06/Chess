@@ -3,6 +3,7 @@ package game;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -28,10 +29,13 @@ public class ChessController implements Initializable {
     private boolean whiteturn = true;
 
     @FXML GridPane gamePane;
+    @FXML Label victoryMessage;
 
     public void initialize(URL url, ResourceBundle rb) {
         mainClass = Main.getInstance();
         InitializeBoard();
+        victoryMessage.setDisable(true);
+        victoryMessage.setVisible(false);
     }
 
     //Creates the board and places all of the pieces. Called in initialize method.
@@ -147,6 +151,70 @@ public class ChessController implements Initializable {
                 @Override
                 public void handle(MouseEvent mouseEvent) {
                     BlackRookPressed(r, c);
+                }
+            });
+        }
+        else if(piece.equals("wBishop")){
+            chessBoard[rowCount][columnCount].addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
+                @Override
+                public void handle(MouseEvent mouseEvent) {
+                    WhiteBishopPressed(r, c);
+                }
+            });
+        }
+        else if(piece.equals("bBishop")){
+            chessBoard[rowCount][columnCount].addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
+                @Override
+                public void handle(MouseEvent mouseEvent) {
+                    BlackBishopPressed(r, c);
+                }
+            });
+        }
+        else if(piece.equals("wQueen")){
+            chessBoard[rowCount][columnCount].addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
+                @Override
+                public void handle(MouseEvent mouseEvent) {
+                    WhiteQueenPressed(r, c);
+                }
+            });
+        }
+        else if(piece.equals("bQueen")){
+            chessBoard[rowCount][columnCount].addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
+                @Override
+                public void handle(MouseEvent mouseEvent) {
+                    BlackQueenPressed(r, c);
+                }
+            });
+        }
+        else if(piece.equals("wKnight")){
+            chessBoard[rowCount][columnCount].addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
+                @Override
+                public void handle(MouseEvent mouseEvent) {
+                    WhiteKnightPressed(r, c);
+                }
+            });
+        }
+        else if(piece.equals("bKnight")){
+            chessBoard[rowCount][columnCount].addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
+                @Override
+                public void handle(MouseEvent mouseEvent) {
+                    BlackKnightPressed(r, c);
+                }
+            });
+        }
+        else if(piece.equals("wKing")){
+            chessBoard[rowCount][columnCount].addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
+                @Override
+                public void handle(MouseEvent mouseEvent) {
+                    WhiteKingPressed(r, c);
+                }
+            });
+        }
+        else if(piece.equals("bKing")){
+            chessBoard[rowCount][columnCount].addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
+                @Override
+                public void handle(MouseEvent mouseEvent) {
+                   BlackKingPressed(r, c);
                 }
             });
         }
@@ -313,6 +381,7 @@ public class ChessController implements Initializable {
             }
             count++;
         }
+
         RedrawBoard();
         itemSelected = false;
         selectionRow = 99;
@@ -322,6 +391,42 @@ public class ChessController implements Initializable {
         }
         else{
             whiteturn = true;
+        }
+
+        //check to see if a king has been killed and then declare victory
+        int rowCount = 0;
+        boolean whiteKingPresent = false;
+        boolean blackKingPresent = false;
+        while(rowCount < 8){
+            int columnCount = 0;
+            while(columnCount < 8){
+                if(piecePositions[rowCount][columnCount].equals("wKing")){
+                    whiteKingPresent = true;
+                }
+                else if(piecePositions[rowCount][columnCount].equals("bKing")){
+                    blackKingPresent = true;
+                }
+                columnCount++;
+            }
+            rowCount++;
+        }
+
+        //If black won
+        if(!whiteKingPresent){
+            victoryMessage.setText("Black wins!");
+            gamePane.setDisable(true);
+            gamePane.setOpacity(.4);
+            victoryMessage.setOpacity(1);
+            victoryMessage.setVisible(true);
+        }
+
+        //If white won
+        else if(!blackKingPresent){
+            victoryMessage.setText("White wins!");
+            gamePane.setDisable(true);
+            gamePane.setOpacity(.4);
+            victoryMessage.setOpacity(1);
+            victoryMessage.setVisible(true);
         }
     }
 
@@ -656,6 +761,768 @@ public class ChessController implements Initializable {
                 break;
             }
             column--;
+        }
+    }
+
+    private void WhiteBishopPressed(int r, int c){
+        //if you already have an item selected return
+        if (itemSelected){
+            return;
+        }
+        //if it is black's turn, return
+        if(!whiteturn){
+            return;
+        }
+        //if you are just now selecting the white bishop
+        itemSelected = true;
+        selectionRow = r;
+        selectionColumn = c;
+        HighlightSelection(r, c);
+
+        //check up and left
+        int row = r + 1;
+        int column = c - 1;
+        while((row < 8 && column >= 0)){
+            if(piecePositions[row][column].equals("Empty")){
+                HighlightMove(row, column);
+            }
+            else if(piecePositions[row][column].substring(0, 1).equals("b")){
+                HighlightMove(row, column);
+                break;
+            }
+            else if(piecePositions[row][column].substring(0, 1).equals("w")){
+                break;
+            }
+            row++;
+            column--;
+        }
+
+        //checks up and right
+        row = r + 1;
+        column = c + 1;
+        while((row < 8 && column < 8)){
+            if(piecePositions[row][column].equals("Empty")){
+                HighlightMove(row, column);
+            }
+            else if(piecePositions[row][column].substring(0, 1).equals("b")){
+                HighlightMove(row, column);
+                break;
+            }
+            else if(piecePositions[row][column].substring(0, 1).equals("w")){
+                break;
+            }
+            row++;
+            column++;
+        }
+
+        //checks down and left
+        row = r - 1;
+        column = c - 1;
+        while((row >= 0 && column >= 0)){
+            if(piecePositions[row][column].equals("Empty")){
+                HighlightMove(row, column);
+            }
+            else if(piecePositions[row][column].substring(0, 1).equals("b")){
+                HighlightMove(row, column);
+                break;
+            }
+            else if(piecePositions[row][column].substring(0, 1).equals("w")){
+                break;
+            }
+            row--;
+            column--;
+        }
+
+        //checks down and right
+        row = r - 1;
+        column = c + 1;
+        while((row >= 0 && column < 8)){
+            if(piecePositions[row][column].equals("Empty")){
+                HighlightMove(row, column);
+            }
+            else if(piecePositions[row][column].substring(0, 1).equals("b")){
+                HighlightMove(row, column);
+                break;
+            }
+            else if(piecePositions[row][column].substring(0, 1).equals("w")){
+                break;
+            }
+            row--;
+            column++;
+        }
+    }
+
+    private void BlackBishopPressed(int r, int c){
+        //if you already have an item selected return
+        if (itemSelected){
+            return;
+        }
+        //if it is white's turn, return
+        if(whiteturn){
+            return;
+        }
+        //if you are just now selecting the black bishop
+        itemSelected = true;
+        selectionRow = r;
+        selectionColumn = c;
+        HighlightSelection(r, c);
+
+        //check up and left
+        int row = r + 1;
+        int column = c - 1;
+        while((row < 8 && column >= 0)){
+            if(piecePositions[row][column].equals("Empty")){
+                HighlightMove(row, column);
+            }
+            else if(piecePositions[row][column].substring(0, 1).equals("w")){
+                HighlightMove(row, column);
+                break;
+            }
+            else if(piecePositions[row][column].substring(0, 1).equals("b")){
+                break;
+            }
+            row++;
+            column--;
+        }
+
+        //checks up and right
+        row = r + 1;
+        column = c + 1;
+        while((row < 8 && column < 8)){
+            if(piecePositions[row][column].equals("Empty")){
+                HighlightMove(row, column);
+            }
+            else if(piecePositions[row][column].substring(0, 1).equals("w")){
+                HighlightMove(row, column);
+                break;
+            }
+            else if(piecePositions[row][column].substring(0, 1).equals("b")){
+                break;
+            }
+            row++;
+            column++;
+        }
+
+        //checks down and left
+        row = r - 1;
+        column = c - 1;
+        while((row >= 0 && column >= 0)){
+            if(piecePositions[row][column].equals("Empty")){
+                HighlightMove(row, column);
+            }
+            else if(piecePositions[row][column].substring(0, 1).equals("w")){
+                HighlightMove(row, column);
+                break;
+            }
+            else if(piecePositions[row][column].substring(0, 1).equals("b")){
+                break;
+            }
+            row--;
+            column--;
+        }
+
+        //checks down and right
+        row = r - 1;
+        column = c + 1;
+        while((row >= 0 && column < 8)){
+            if(piecePositions[row][column].equals("Empty")){
+                HighlightMove(row, column);
+            }
+            else if(piecePositions[row][column].substring(0, 1).equals("w")){
+                HighlightMove(row, column);
+                break;
+            }
+            else if(piecePositions[row][column].substring(0, 1).equals("b")){
+                break;
+            }
+            row--;
+            column++;
+        }
+    }
+
+    private void WhiteQueenPressed(int r, int c){
+        //if you already have an item selected return
+        if (itemSelected){
+            return;
+        }
+        //if it is black's turn, return
+        if(!whiteturn){
+            return;
+        }
+        //if you are just now selecting the white queen
+        itemSelected = true;
+        selectionRow = r;
+        selectionColumn = c;
+        HighlightSelection(r, c);
+
+        //check up and left
+        int row = r + 1;
+        int column = c - 1;
+        while((row < 8 && column >= 0)){
+            if(piecePositions[row][column].equals("Empty")){
+                HighlightMove(row, column);
+            }
+            else if(piecePositions[row][column].substring(0, 1).equals("b")){
+                HighlightMove(row, column);
+                break;
+            }
+            else if(piecePositions[row][column].substring(0, 1).equals("w")){
+                break;
+            }
+            row++;
+            column--;
+        }
+
+        //checks up and right
+        row = r + 1;
+        column = c + 1;
+        while((row < 8 && column < 8)){
+            if(piecePositions[row][column].equals("Empty")){
+                HighlightMove(row, column);
+            }
+            else if(piecePositions[row][column].substring(0, 1).equals("b")){
+                HighlightMove(row, column);
+                break;
+            }
+            else if(piecePositions[row][column].substring(0, 1).equals("w")){
+                break;
+            }
+            row++;
+            column++;
+        }
+
+        //checks down and left
+        row = r - 1;
+        column = c - 1;
+        while((row >= 0 && column >= 0)){
+            if(piecePositions[row][column].equals("Empty")){
+                HighlightMove(row, column);
+            }
+            else if(piecePositions[row][column].substring(0, 1).equals("b")){
+                HighlightMove(row, column);
+                break;
+            }
+            else if(piecePositions[row][column].substring(0, 1).equals("w")){
+                break;
+            }
+            row--;
+            column--;
+        }
+
+        //checks down and right
+        row = r - 1;
+        column = c + 1;
+        while((row >= 0 && column < 8)){
+            if(piecePositions[row][column].equals("Empty")){
+                HighlightMove(row, column);
+            }
+            else if(piecePositions[row][column].substring(0, 1).equals("b")){
+                HighlightMove(row, column);
+                break;
+            }
+            else if(piecePositions[row][column].substring(0, 1).equals("w")){
+                break;
+            }
+            row--;
+            column++;
+        }
+
+        //checks moves up
+         row = r + 1;
+        while((row < 8)){
+            if(piecePositions[row][c].equals("Empty")){
+                HighlightMove(row, c);
+            }
+            else if(piecePositions[row][c].substring(0, 1).equals("b")){
+                HighlightMove(row, c);
+                break;
+            }
+            else if(piecePositions[row][c].substring(0, 1).equals("w")){
+                break;
+            }
+            row++;
+        }
+        //checks moves down
+        row = r - 1;
+        while(row >= 0){
+            if(piecePositions[row][c].equals("Empty")){
+                HighlightMove(row, c);
+            }
+            else if(piecePositions[row][c].substring(0, 1).equals("b")){
+                HighlightMove(row, c);
+                break;
+            }
+            else if(piecePositions[row][c].substring(0, 1).equals("w")){
+                break;
+            }
+            row--;
+        }
+        //checks moves right
+        column = c + 1;
+        while(column < 8){
+            if(piecePositions[r][column].equals("Empty")){
+                HighlightMove(r, column);
+            }
+            else if(piecePositions[r][column].substring(0, 1).equals("b")){
+                HighlightMove(r, column);
+                break;
+            }
+            else if(piecePositions[r][column].substring(0, 1).equals("w")){
+                break;
+            }
+            column++;
+        }
+        //checks moves left
+        column = c - 1;
+        while(column >= 0){
+            if(piecePositions[r][column].equals("Empty")){
+                HighlightMove(r, column);
+            }
+            else if(piecePositions[r][column].substring(0, 1).equals("b")){
+                HighlightMove(r, column);
+                break;
+            }
+            else if(piecePositions[r][column].substring(0, 1).equals("w")){
+                break;
+            }
+            column--;
+        }
+    }
+
+    private void BlackQueenPressed(int r, int c){
+        //if you already have an item selected return
+        if (itemSelected){
+            return;
+        }
+        //if it is white's turn, return
+        if(whiteturn){
+            return;
+        }
+        //if you are just now selecting the black queen
+        itemSelected = true;
+        selectionRow = r;
+        selectionColumn = c;
+        HighlightSelection(r, c);
+
+        //check up and left
+        int row = r + 1;
+        int column = c - 1;
+        while((row < 8 && column >= 0)){
+            if(piecePositions[row][column].equals("Empty")){
+                HighlightMove(row, column);
+            }
+            else if(piecePositions[row][column].substring(0, 1).equals("w")){
+                HighlightMove(row, column);
+                break;
+            }
+            else if(piecePositions[row][column].substring(0, 1).equals("b")){
+                break;
+            }
+            row++;
+            column--;
+        }
+
+        //checks up and right
+        row = r + 1;
+        column = c + 1;
+        while((row < 8 && column < 8)){
+            if(piecePositions[row][column].equals("Empty")){
+                HighlightMove(row, column);
+            }
+            else if(piecePositions[row][column].substring(0, 1).equals("w")){
+                HighlightMove(row, column);
+                break;
+            }
+            else if(piecePositions[row][column].substring(0, 1).equals("b")){
+                break;
+            }
+            row++;
+            column++;
+        }
+
+        //checks down and left
+        row = r - 1;
+        column = c - 1;
+        while((row >= 0 && column >= 0)){
+            if(piecePositions[row][column].equals("Empty")){
+                HighlightMove(row, column);
+            }
+            else if(piecePositions[row][column].substring(0, 1).equals("w")){
+                HighlightMove(row, column);
+                break;
+            }
+            else if(piecePositions[row][column].substring(0, 1).equals("b")){
+                break;
+            }
+            row--;
+            column--;
+        }
+
+        //checks down and right
+        row = r - 1;
+        column = c + 1;
+        while((row >= 0 && column < 8)){
+            if(piecePositions[row][column].equals("Empty")){
+                HighlightMove(row, column);
+            }
+            else if(piecePositions[row][column].substring(0, 1).equals("w")){
+                HighlightMove(row, column);
+                break;
+            }
+            else if(piecePositions[row][column].substring(0, 1).equals("b")){
+                break;
+            }
+            row--;
+            column++;
+        }
+
+        //checks moves up
+        row = r + 1;
+        while((row < 8)){
+            if(piecePositions[row][c].equals("Empty")){
+                HighlightMove(row, c);
+            }
+            else if(piecePositions[row][c].substring(0, 1).equals("w")){
+                HighlightMove(row, c);
+                break;
+            }
+            else if(piecePositions[row][c].substring(0, 1).equals("b")){
+                break;
+            }
+            row++;
+        }
+        //checks moves down
+        row = r - 1;
+        while(row >= 0){
+            if(piecePositions[row][c].equals("Empty")){
+                HighlightMove(row, c);
+            }
+            else if(piecePositions[row][c].substring(0, 1).equals("w")){
+                HighlightMove(row, c);
+                break;
+            }
+            else if(piecePositions[row][c].substring(0, 1).equals("b")){
+                break;
+            }
+            row--;
+        }
+        //checks moves right
+        column = c + 1;
+        while(column < 8){
+            if(piecePositions[r][column].equals("Empty")){
+                HighlightMove(r, column);
+            }
+            else if(piecePositions[r][column].substring(0, 1).equals("w")){
+                HighlightMove(r, column);
+                break;
+            }
+            else if(piecePositions[r][column].substring(0, 1).equals("b")){
+                break;
+            }
+            column++;
+        }
+        //checks moves left
+        column = c - 1;
+        while(column >= 0){
+            if(piecePositions[r][column].equals("Empty")){
+                HighlightMove(r, column);
+            }
+            else if(piecePositions[r][column].substring(0, 1).equals("w")){
+                HighlightMove(r, column);
+                break;
+            }
+            else if(piecePositions[r][column].substring(0, 1).equals("b")){
+                break;
+            }
+            column--;
+        }
+    }
+
+    private void WhiteKnightPressed(int r, int c){
+        //if you already have an item selected return
+        if (itemSelected){
+            return;
+        }
+        //if it is black's turn, return
+        if(!whiteturn){
+            return;
+        }
+        //if you are just now selecting the white knight
+        itemSelected = true;
+        selectionRow = r;
+        selectionColumn = c;
+        HighlightSelection(r, c);
+
+        //checks up and far left move
+        if(r + 1 < 8 && c - 2 >=0){
+            if(piecePositions[r + 1][c - 2].equals("Empty") || piecePositions[r + 1][c - 2].substring(0, 1).equals("b")){
+                HighlightMove(r + 1, c - 2);
+            }
+        }
+
+        //checks far up and left move
+        if(r + 2 < 8 && c - 1 >=0){
+            if(piecePositions[r + 2][c - 1].equals("Empty") || piecePositions[r + 2][c - 1].substring(0, 1).equals("b")){
+                HighlightMove(r + 2, c - 1);
+            }
+        }
+
+        //checks down and far left move
+        if(r - 1 >= 0 && c - 2 >=0){
+            if(piecePositions[r - 1][c - 2].equals("Empty") || piecePositions[r - 1][c - 2].substring(0, 1).equals("b")){
+                HighlightMove(r - 1, c - 2);
+            }
+        }
+
+        //checks far down and left move
+        if(r - 2 >= 0 && c - 1 >=0){
+            if(piecePositions[r - 2][c - 1].equals("Empty") || piecePositions[r - 2][c - 1].substring(0, 1).equals("b")){
+                HighlightMove(r - 2, c - 1);
+            }
+        }
+
+        //checks up and far right move
+        if(r + 1 < 8 && c + 2 < 8){
+            if(piecePositions[r + 1][c + 2].equals("Empty") || piecePositions[r + 1][c + 2].substring(0, 1).equals("b")){
+                HighlightMove(r + 1, c + 2);
+            }
+        }
+
+        //checks far up and right move
+        if(r + 2 < 8 && c + 1 < 8){
+            if(piecePositions[r + 2][c + 1].equals("Empty") || piecePositions[r + 2][c + 1].substring(0, 1).equals("b")){
+                HighlightMove(r + 2, c + 1);
+            }
+        }
+
+        //checks down and far right move
+        if(r - 1 >= 0 && c + 2 < 8){
+            if(piecePositions[r - 1][c + 2].equals("Empty") || piecePositions[r - 1][c + 2].substring(0, 1).equals("b")){
+                HighlightMove(r - 1, c + 2);
+            }
+        }
+
+        //checks far down and right move
+        if(r - 2 >= 0 && c + 1 < 8){
+            if(piecePositions[r - 2][c + 1].equals("Empty") || piecePositions[r - 2][c + 1].substring(0, 1).equals("b")){
+                HighlightMove(r - 2, c + 1);
+            }
+        }
+    }
+
+    private void BlackKnightPressed(int r, int c){
+        //if you already have an item selected return
+        if (itemSelected){
+            return;
+        }
+        //if it is white's turn, return
+        if(whiteturn){
+            return;
+        }
+        //if you are just now selecting the black knight
+        itemSelected = true;
+        selectionRow = r;
+        selectionColumn = c;
+        HighlightSelection(r, c);
+
+        //checks up and far left move
+        if(r + 1 < 8 && c - 2 >=0){
+            if(piecePositions[r + 1][c - 2].equals("Empty") || piecePositions[r + 1][c - 2].substring(0, 1).equals("w")){
+                HighlightMove(r + 1, c - 2);
+            }
+        }
+
+        //checks far up and left move
+        if(r + 2 < 8 && c - 1 >=0){
+            if(piecePositions[r + 2][c - 1].equals("Empty") || piecePositions[r + 2][c - 1].substring(0, 1).equals("w")){
+                HighlightMove(r + 2, c - 1);
+            }
+        }
+
+        //checks down and far left move
+        if(r - 1 >= 0 && c - 2 >=0){
+            if(piecePositions[r - 1][c - 2].equals("Empty") || piecePositions[r - 1][c - 2].substring(0, 1).equals("w")){
+                HighlightMove(r - 1, c - 2);
+            }
+        }
+
+        //checks far down and left move
+        if(r - 2 >= 0 && c - 1 >=0){
+            if(piecePositions[r - 2][c - 1].equals("Empty") || piecePositions[r - 2][c - 1].substring(0, 1).equals("w")){
+                HighlightMove(r - 2, c - 1);
+            }
+        }
+
+        //checks up and far right move
+        if(r + 1 < 8 && c + 2 < 8){
+            if(piecePositions[r + 1][c + 2].equals("Empty") || piecePositions[r + 1][c + 2].substring(0, 1).equals("w")){
+                HighlightMove(r + 1, c + 2);
+            }
+        }
+
+        //checks far up and right move
+        if(r + 2 < 8 && c + 1 < 8){
+            if(piecePositions[r + 2][c + 1].equals("Empty") || piecePositions[r + 2][c + 1].substring(0, 1).equals("w")){
+                HighlightMove(r + 2, c + 1);
+            }
+        }
+
+        //checks down and far right move
+        if(r - 1 >= 0 && c + 2 < 8){
+            if(piecePositions[r - 1][c + 2].equals("Empty") || piecePositions[r - 1][c + 2].substring(0, 1).equals("w")){
+                HighlightMove(r - 1, c + 2);
+            }
+        }
+
+        //checks far down and right move
+        if(r - 2 >= 0 && c + 1 < 8){
+            if(piecePositions[r - 2][c + 1].equals("Empty") || piecePositions[r - 2][c + 1].substring(0, 1).equals("w")){
+                HighlightMove(r - 2, c + 1);
+            }
+        }
+    }
+
+    private void WhiteKingPressed(int r, int c){
+        //if you already have an item selected return
+        if (itemSelected){
+            return;
+        }
+        //if it is black's turn, return
+        if(!whiteturn){
+            return;
+        }
+        //if you are just now selecting the white king
+        itemSelected = true;
+        selectionRow = r;
+        selectionColumn = c;
+        HighlightSelection(r, c);
+
+        //check straight up move
+        if(r + 1 < 8){
+            if(piecePositions[r + 1][c].equals("Empty") || piecePositions[r + 1][c].substring(0, 1).equals("b")){
+                HighlightMove(r + 1, c);
+            }
+        }
+
+        //check up and left move
+        if(r + 1 < 8 && c - 1 >= 0){
+            if(piecePositions[r + 1][c - 1].equals("Empty") || piecePositions[r + 1][c - 1].substring(0, 1).equals("b")){
+                HighlightMove(r + 1, c - 1);
+            }
+        }
+
+        //check up and right move
+        if(r + 1 < 8 && c + 1 < 8){
+            if(piecePositions[r + 1][c + 1].equals("Empty") || piecePositions[r + 1][c + 1].substring(0, 1).equals("b")){
+                HighlightMove(r + 1, c + 1);
+            }
+        }
+
+        //check left move
+        if(c -1 >= 0){
+            if(piecePositions[r][c - 1].equals("Empty") || piecePositions[r][c - 1].substring(0, 1).equals("b")){
+                HighlightMove(r, c - 1);
+            }
+        }
+
+        //check right move
+        if(c + 1 < 8){
+            if(piecePositions[r][c + 1].equals("Empty") || piecePositions[r][c + 1].substring(0, 1).equals("b")){
+                HighlightMove(r, c + 1);
+            }
+        }
+
+        //check down left move
+        if(r - 1 >= 0 && c - 1 >= 0){
+            if(piecePositions[r - 1][c - 1].equals("Empty") || piecePositions[r - 1][c - 1].substring(0, 1).equals("b")){
+                HighlightMove(r - 1, c - 1);
+            }
+        }
+
+        //check straight down move
+        if(r - 1 >= 0){
+            if(piecePositions[r - 1][c].equals("Empty") || piecePositions[r - 1][c].substring(0, 1).equals("b")){
+                HighlightMove(r - 1, c);
+            }
+        }
+
+        //check down and right move
+        if(r - 1 >= 0 && c + 1 < 8){
+            if(piecePositions[r - 1][c + 1].equals("Empty") || piecePositions[r - 1][c + 1].substring(0, 1).equals("b")){
+                HighlightMove(r - 1, c + 1);
+            }
+        }
+    }
+
+    private void BlackKingPressed(int r, int c){
+        //if you already have an item selected return
+        if (itemSelected){
+            return;
+        }
+        //if it is white's turn, return
+        if(whiteturn){
+            return;
+        }
+        //if you are just now selecting the black king
+        itemSelected = true;
+        selectionRow = r;
+        selectionColumn = c;
+        HighlightSelection(r, c);
+
+        //check straight up move
+        if(r + 1 < 8){
+            if(piecePositions[r + 1][c].equals("Empty") || piecePositions[r + 1][c].substring(0, 1).equals("w")){
+                HighlightMove(r + 1, c);
+            }
+        }
+
+        //check up and left move
+        if(r + 1 < 8 && c - 1 >= 0){
+            if(piecePositions[r + 1][c - 1].equals("Empty") || piecePositions[r + 1][c - 1].substring(0, 1).equals("w")){
+                HighlightMove(r + 1, c - 1);
+            }
+        }
+
+        //check up and right move
+        if(r + 1 < 8 && c + 1 < 8){
+            if(piecePositions[r + 1][c + 1].equals("Empty") || piecePositions[r + 1][c + 1].substring(0, 1).equals("w")){
+                HighlightMove(r + 1, c + 1);
+            }
+        }
+
+        //check left move
+        if(c -1 >= 0){
+            if(piecePositions[r][c - 1].equals("Empty") || piecePositions[r][c - 1].substring(0, 1).equals("w")){
+                HighlightMove(r, c - 1);
+            }
+        }
+
+        //check right move
+        if(c + 1 < 8){
+            if(piecePositions[r][c + 1].equals("Empty") || piecePositions[r][c + 1].substring(0, 1).equals("w")){
+                HighlightMove(r, c + 1);
+            }
+        }
+
+        //check down left move
+        if(r - 1 >= 0 && c - 1 >= 0){
+            if(piecePositions[r - 1][c - 1].equals("Empty") || piecePositions[r - 1][c - 1].substring(0, 1).equals("w")){
+                HighlightMove(r - 1, c - 1);
+            }
+        }
+
+        //check straight down move
+        if(r - 1 >= 0){
+            if(piecePositions[r - 1][c].equals("Empty") || piecePositions[r - 1][c].substring(0, 1).equals("w")){
+                HighlightMove(r - 1, c);
+            }
+        }
+
+        //check down and right move
+        if(r - 1 >= 0 && c + 1 < 8){
+            if(piecePositions[r - 1][c + 1].equals("Empty") || piecePositions[r - 1][c + 1].substring(0, 1).equals("w")){
+                HighlightMove(r - 1, c + 1);
+            }
         }
     }
 }
