@@ -30,12 +30,15 @@ public class ChessController implements Initializable {
 
     @FXML GridPane gamePane;
     @FXML Label victoryMessage;
+    @FXML Label playAgain;
 
     public void initialize(URL url, ResourceBundle rb) {
         mainClass = Main.getInstance();
         InitializeBoard();
         victoryMessage.setDisable(true);
         victoryMessage.setVisible(false);
+        playAgain.setDisable(true);
+        playAgain.setVisible(false);
     }
 
     //Creates the board and places all of the pieces. Called in initialize method.
@@ -417,7 +420,10 @@ public class ChessController implements Initializable {
             gamePane.setDisable(true);
             gamePane.setOpacity(.4);
             victoryMessage.setOpacity(1);
+            playAgain.setOpacity(1);
             victoryMessage.setVisible(true);
+            playAgain.setVisible(true);
+            playAgain.setDisable(false);
         }
 
         //If white won
@@ -426,7 +432,10 @@ public class ChessController implements Initializable {
             gamePane.setDisable(true);
             gamePane.setOpacity(.4);
             victoryMessage.setOpacity(1);
+            playAgain.setOpacity(1);
             victoryMessage.setVisible(true);
+            playAgain.setVisible(true);
+            playAgain.setDisable(false);
         }
     }
 
@@ -470,6 +479,27 @@ public class ChessController implements Initializable {
             rowCount++;
         }
 
+    }
+
+    @FXML public void PlayAgainHovered(){
+        playAgain.setUnderline(true);
+    }
+
+    @FXML public void PlayAgainExited(){
+        playAgain.setUnderline(false);
+    }
+
+    @FXML public void PlayAgainClicked(){
+        gamePane.setDisable(false);
+        gamePane.setOpacity(1);
+        playAgain.setDisable(true);
+        playAgain.setUnderline(false);
+        playAgain.setVisible(false);
+        victoryMessage.setVisible(false);
+
+        InitializeBoard();
+        RedrawBoard();
+        whiteturn = true;
     }
 
     //---------------------------------------Logic for chess pieces----------------------------------------------//

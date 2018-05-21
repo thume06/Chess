@@ -36,5 +36,10 @@
             <Font size="96.0" />
          </font>
       </Label>
+      <Label fx:id="playAgain" alignment="CENTER" layoutY="600.0" onMouseEntered="#PlayAgainHovered" onMouseExited="#PlayAgainExited" onMousePressed="#PlayAgainClicked" prefHeight="75.0" prefWidth="800.0" text="Play again">
+         <font>
+            <Font size="52.0" />
+         </font>
+      </Label>
    </children>
 </AnchorPane>
