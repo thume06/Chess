@@ -126,6 +126,30 @@ public class ChessController implements Initializable {
                 }
             });
         }
+        else if(piece.equals("bPawn")){
+            chessBoard[rowCount][columnCount].addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
+                @Override
+                public void handle(MouseEvent mouseEvent) {
+                    BlackPawnPressed(r, c);
+                }
+            });
+        }
+        else if(piece.equals("wRook")){
+            chessBoard[rowCount][columnCount].addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
+                @Override
+                public void handle(MouseEvent mouseEvent) {
+                    WhiteRookPressed(r, c);
+                }
+            });
+        }
+        else if(piece.equals("bRook")){
+            chessBoard[rowCount][columnCount].addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
+                @Override
+                public void handle(MouseEvent mouseEvent) {
+                    BlackRookPressed(r, c);
+                }
+            });
+        }
 
         if(r == 0){
             rowCount = 7;
@@ -277,43 +301,31 @@ public class ChessController implements Initializable {
         String piece = piecePositions[selectionRow][selectionColumn];
         piecePositions[selectionRow][selectionColumn] = "Empty";
         piecePositions[r][c] = piece;
+
+        //check to see if a pawn has made it to the end and change it to a queen
+        int count = 0;
+        while(count < 8){
+            if(piecePositions[7][count].equals("wPawn")){
+                piecePositions[7][count] = "wQueen";
+            }
+            if(piecePositions[0][count].equals("bPawn")){
+                piecePositions[0][count] = "bQueen";
+            }
+            count++;
+        }
         RedrawBoard();
         itemSelected = false;
         selectionRow = 99;
         selectionColumn = 99;
+        if(whiteturn){
+            whiteturn = false;
+        }
+        else{
+            whiteturn = true;
+        }
     }
 
-    private void WhitePawnPressed(int r, int c){
-        //if you already have a selected item
-        if (itemSelected){
-            return;
-        }
-        //if you are just now selecting the white pawn
-        else if(whiteturn){
-            itemSelected = true;
-            selectionRow = r;
-            selectionColumn = c;
-            HighlightSelection(r, c);
-            //if it is the first move of the pawn
-            if(r == 1){
-                if(piecePositions[r + 1][c] == "Empty"){
-                    HighlightMove(r + 1, c);
-                    if(piecePositions[r + 2][c] == "Empty"){
-                        HighlightMove(r + 2, c);
-                    }
-                }
-            }
-            //if it is not the first move of the pawn
-            else{
-                if(piecePositions[r + 1][c] == "Empty"){
-                    HighlightMove(r + 1, c);
-                }
-            }
-        }
-        //returns if it is not white's turn
-        return;
-    }
-
+    //Redraws the board after piece positions are changed or a piece is selected
     private void RedrawBoard(){
 
         //clears the pane of all images
@@ -353,5 +365,297 @@ public class ChessController implements Initializable {
             rowCount++;
         }
 
+    }
+
+    //---------------------------------------Logic for chess pieces----------------------------------------------//
+    //TODO Maybe figure out en passant later on.
+    private void WhitePawnPressed(int r, int c){
+        //if you already have a selected item
+        if (itemSelected){
+            return;
+        }
+        //if you are just now selecting the white pawn
+        else if(whiteturn){
+            itemSelected = true;
+            selectionRow = r;
+            selectionColumn = c;
+            HighlightSelection(r, c);
+            //if it is the first move of the pawn
+            if(r == 1){
+                if(piecePositions[r + 1][c].equals("Empty")){
+                    HighlightMove(r + 1, c);
+                    if(piecePositions[r + 2][c].equals("Empty")){
+                        HighlightMove(r + 2, c);
+                    }
+                }
+                //first move and if there are enemies
+                if((c + 1 < 8) && (c - 1 >= 0)){
+                    if(piecePositions[r + 1][c - 1].substring(0, 1).equals("b")){
+                        HighlightMove(r + 1, c - 1);
+                    }
+                    if(piecePositions[r + 1][c + 1].substring(0, 1).equals("b")){
+                        HighlightMove(r + 1, c + 1);
+                    }
+                }
+                if((c + 1 == 8)){
+                    if(piecePositions[r + 1][c - 1].substring(0, 1).equals("b")){
+                        HighlightMove(r + 1, c - 1);
+                    }
+                }
+                if(c - 1 == -1){
+                    if(piecePositions[r + 1][c + 1].substring(0, 1).equals("b")){
+                        HighlightMove(r + 1, c + 1);
+                    }
+                }
+            }
+            //if it is not the first move of the pawn
+            else{
+                if((r + 1 < 8) && piecePositions[r + 1][c].equals("Empty")){
+                    HighlightMove(r + 1, c);
+                }
+                //if there is an enemy
+                if((c + 1 < 8) && (c - 1 >= 0) && (r + 1 < 8)){
+                    if(piecePositions[r + 1][c - 1].substring(0, 1).equals("b")){
+                        HighlightMove(r + 1, c - 1);
+                    }
+                    if(piecePositions[r + 1][c + 1].substring(0, 1).equals("b")){
+                        HighlightMove(r + 1, c + 1);
+                    }
+                }
+                if((c - 1 == -1) && r + 1 < 8){
+                    if(piecePositions[r + 1][c + 1].substring(0, 1).equals("b")){
+                        HighlightMove(r + 1, c + 1);
+                    }
+                }
+                if((c + 1 == 8) && r + 1 < 8){
+                    if(piecePositions[r + 1][c - 1].substring(0, 1).equals("b")){
+                        HighlightMove(r + 1, c - 1);
+                    }
+                }
+            }
+        }
+        //returns if it is not white's turn
+        return;
+    }
+
+    private void BlackPawnPressed(int r, int c){
+        //if you already have a selected item
+        if (itemSelected){
+            return;
+        }
+        //if you are just now selecting the black pawn
+        else if(!whiteturn){
+            itemSelected = true;
+            selectionRow = r;
+            selectionColumn = c;
+            HighlightSelection(r, c);
+            //if it is the first move of the pawn
+            if(r == 6){
+                if(piecePositions[r - 1][c].equals("Empty")){
+                    HighlightMove(r - 1, c);
+                    if(piecePositions[r - 2][c].equals("Empty")){
+                        HighlightMove(r - 2, c);
+                    }
+                }
+                //first move and if there are enemies
+                if((c + 1 < 8) && (c - 1 >= 0)){
+                    if(piecePositions[r - 1][c - 1].substring(0, 1).equals("w")){
+                        HighlightMove(r - 1, c - 1);
+                    }
+                    if(piecePositions[r - 1][c + 1].substring(0, 1).equals("w")){
+                        HighlightMove(r - 1, c + 1);
+                    }
+                }
+                if((c + 1 == 8)){
+                    if(piecePositions[r - 1][c - 1].substring(0, 1).equals("w")){
+                        HighlightMove(r - 1, c - 1);
+                    }
+                }
+                if(c - 1 == -1){
+                    if(piecePositions[r - 1][c + 1].substring(0, 1).equals("w")){
+                        HighlightMove(r - 1, c + 1);
+                    }
+                }
+            }
+            //if it is not the first move of the pawn
+            else{
+                if((r - 1 >= 0) && piecePositions[r - 1][c].equals("Empty")){
+                    HighlightMove(r - 1, c);
+                }
+                //if there is an enemy
+                if((c + 1 < 8) && (c - 1 >= 0) && (r - 1 >= 0)){
+                    if(piecePositions[r - 1][c - 1].substring(0, 1).equals("w")){
+                        HighlightMove(r - 1, c - 1);
+                    }
+                    if(piecePositions[r - 1][c + 1].substring(0, 1).equals("w")){
+                        HighlightMove(r - 1, c + 1);
+                    }
+                }
+                if((c - 1 == -1) && r -1 >= 0){
+                    if(piecePositions[r - 1][c + 1].substring(0, 1).equals("w")){
+                        HighlightMove(r - 1, c + 1);
+                    }
+                }
+                if((c + 1 == 8) && r - 1 >= 0){
+                    if(piecePositions[r - 1][c - 1].substring(0, 1).equals("w")){
+                        HighlightMove(r - 1, c - 1);
+                    }
+                }
+            }
+        }
+        //returns if it is not black's turn
+        return;
+    }
+
+    private void WhiteRookPressed(int r, int c){
+        //if you already have an item selected return
+        if (itemSelected){
+            return;
+        }
+        //if it is black's turn, return
+        if(!whiteturn){
+            return;
+        }
+        //if you are just now selecting the white rook
+        itemSelected = true;
+        selectionRow = r;
+        selectionColumn = c;
+        HighlightSelection(r, c);
+        //checks moves up
+        int row = r + 1;
+        while((row < 8)){
+            if(piecePositions[row][c].equals("Empty")){
+                HighlightMove(row, c);
+            }
+            else if(piecePositions[row][c].substring(0, 1).equals("b")){
+                HighlightMove(row, c);
+                break;
+            }
+            else if(piecePositions[row][c].substring(0, 1).equals("w")){
+                break;
+            }
+            row++;
+        }
+        //checks moves down
+        row = r - 1;
+        while(row >= 0){
+            if(piecePositions[row][c].equals("Empty")){
+                HighlightMove(row, c);
+            }
+            else if(piecePositions[row][c].substring(0, 1).equals("b")){
+                HighlightMove(row, c);
+                break;
+            }
+            else if(piecePositions[row][c].substring(0, 1).equals("w")){
+                break;
+            }
+            row--;
+        }
+        //checks moves right
+        int column = c + 1;
+        while(column < 8){
+            if(piecePositions[r][column].equals("Empty")){
+                HighlightMove(r, column);
+            }
+            else if(piecePositions[r][column].substring(0, 1).equals("b")){
+                HighlightMove(r, column);
+                break;
+            }
+            else if(piecePositions[r][column].substring(0, 1).equals("w")){
+                break;
+            }
+            column++;
+        }
+        //checks moves left
+        column = c - 1;
+        while(column >= 0){
+            if(piecePositions[r][column].equals("Empty")){
+                HighlightMove(r, column);
+            }
+            else if(piecePositions[r][column].substring(0, 1).equals("b")){
+                HighlightMove(r, column);
+                break;
+            }
+            else if(piecePositions[r][column].substring(0, 1).equals("w")){
+                break;
+            }
+            column--;
+        }
+    }
+
+    private void BlackRookPressed(int r, int c){
+        //if you already have an item selected return
+        if (itemSelected){
+            return;
+        }
+        //if it is white's turn, return
+        if(whiteturn){
+            return;
+        }
+        //if you are just now selecting the black rook
+        itemSelected = true;
+        selectionRow = r;
+        selectionColumn = c;
+        HighlightSelection(r, c);
+        //checks moves up
+        int row = r + 1;
+        while((row < 8)){
+            if(piecePositions[row][c].equals("Empty")){
+                HighlightMove(row, c);
+            }
+            else if(piecePositions[row][c].substring(0, 1).equals("w")){
+                HighlightMove(row, c);
+                break;
+            }
+            else if(piecePositions[row][c].substring(0, 1).equals("b")){
+                break;
+            }
+            row++;
+        }
+        //checks moves down
+        row = r - 1;
+        while(row >= 0){
+            if(piecePositions[row][c].equals("Empty")){
+                HighlightMove(row, c);
+            }
+            else if(piecePositions[row][c].substring(0, 1).equals("w")){
+                HighlightMove(row, c);
+                break;
+            }
+            else if(piecePositions[row][c].substring(0, 1).equals("b")){
+                break;
+            }
+            row--;
+        }
+        //checks moves right
+        int column = c + 1;
+        while(column < 8){
+            if(piecePositions[r][column].equals("Empty")){
+                HighlightMove(r, column);
+            }
+            else if(piecePositions[r][column].substring(0, 1).equals("w")){
+                HighlightMove(r, column);
+                break;
+            }
+            else if(piecePositions[r][column].substring(0, 1).equals("b")){
+                break;
+            }
+            column++;
+        }
+        //checks moves left
+        column = c - 1;
+        while(column >= 0){
+            if(piecePositions[r][column].equals("Empty")){
+                HighlightMove(r, column);
+            }
+            else if(piecePositions[r][column].substring(0, 1).equals("w")){
+                HighlightMove(r, column);
+                break;
+            }
+            else if(piecePositions[r][column].substring(0, 1).equals("b")){
+                break;
+            }
+            column--;
+        }
     }
 }
