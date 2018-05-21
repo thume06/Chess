@@ -23,13 +23,15 @@ public class ChessController implements Initializable {
     private final int columnMin = 0;
 
     private boolean itemSelected = false;
+    private int selectionRow = 99;
+    private int selectionColumn = 99;
+    private boolean whiteturn = true;
 
     @FXML GridPane gamePane;
 
     public void initialize(URL url, ResourceBundle rb) {
         mainClass = Main.getInstance();
         InitializeBoard();
-        System.out.println(piecePositions[0][0]);
     }
 
     //Creates the board and places all of the pieces. Called in initialize method.
@@ -114,6 +116,7 @@ public class ChessController implements Initializable {
         chessBoard[rowCount][columnCount].setLayoutY(100 * rowCount);
         chessBoard[rowCount][columnCount].setFitWidth(100);
         chessBoard[rowCount][columnCount].setFitHeight(100);
+        chessBoard[rowCount][columnCount].setPickOnBounds(true);
 
         if(piece.equals("wPawn")) {
             chessBoard[rowCount][columnCount].addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
@@ -182,25 +185,138 @@ public class ChessController implements Initializable {
         gamePane.add(new ImageView(new Image("blackSquare.png")), columnCount, rowCount);
     }
 
-    public void WhitePawnPressed(int r, int c){
-        if(itemSelected){ return; }
-        itemSelected = true;
-        chessBoard[r][c] = new ImageView(new Image("wPawnSelected.png"));
-        RedrawBoard(r, c, "Selection");
+    private void HighlightSelection(int r, int c){
+        selectionRow = r;
+        selectionColumn = c;
+        int rowCount = 0;
+        int columnCount = c;
+        if(r == 0){
+            rowCount = 7;
+        }
+        else if(r == 1){
+            rowCount = 6;
+        }
+        else if(r == 2){
+            rowCount = 5;
+        }
+        else if(r == 3){
+            rowCount = 4;
+        }
+        else if(r == 4){
+            rowCount = 3;
+        }
+        else if(r == 5){
+            rowCount = 2;
+        }
+        else if(r == 6){
+            rowCount = 1;
+        }
+        else if(r == 7){
+            rowCount = 0;
+        }
+        ImageView selectionImg = new ImageView(new Image("selection.png"));
+        selectionImg.setFitHeight(100);
+        selectionImg.setFitWidth(100);
+        selectionImg.setPickOnBounds(true);
+        selectionImg.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
+            //When the selection is clicked again, it is deselected.
+            @Override
+            public void handle(MouseEvent mouseEvent) {
+                RedrawBoard();
+                itemSelected = false;
+                selectionRow = 99;
+                selectionColumn = 99;
+            }
+        });
+        gamePane.add(selectionImg, columnCount, rowCount);
     }
 
-    public void RedrawBoard(int r, int c, String x){
-        boolean selection;
-        String selectionImg = "";
-
-        if(x.equals("Selection")){
-            selection = true;
-            selectionImg = (piecePositions[r][c] + "Selected.png");
+    private void HighlightMove(int r, int c){
+        int rowCount = 0;
+        int columnCount = c;
+        if(r == 0){
+            rowCount = 7;
         }
-        else{
-            selection = false;
+        else if(r == 1){
+            rowCount = 6;
         }
+        else if(r == 2){
+            rowCount = 5;
+        }
+        else if(r == 3){
+            rowCount = 4;
+        }
+        else if(r == 4){
+            rowCount = 3;
+        }
+        else if(r == 5){
+            rowCount = 2;
+        }
+        else if(r == 6){
+            rowCount = 1;
+        }
+        else if(r == 7){
+            rowCount = 0;
+        }
+        ImageView selectionImg = new ImageView(new Image("selection.png"));
+        selectionImg.setFitHeight(100);
+        selectionImg.setFitWidth(100);
+        selectionImg.setDisable(false);
+        selectionImg.setPickOnBounds(true);
+        selectionImg.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent mouseEvent) {
+                Move(r, c);
+            }
+        });
+        gamePane.add(selectionImg, columnCount, rowCount);
+    }
 
+    //Method to actually do a move. Called in HighlightMove method.
+    private void Move(int r, int c){
+        String piece = piecePositions[selectionRow][selectionColumn];
+        piecePositions[selectionRow][selectionColumn] = "Empty";
+        piecePositions[r][c] = piece;
+        RedrawBoard();
+        itemSelected = false;
+        selectionRow = 99;
+        selectionColumn = 99;
+    }
+
+    private void WhitePawnPressed(int r, int c){
+        //if you already have a selected item
+        if (itemSelected){
+            return;
+        }
+        //if you are just now selecting the white pawn
+        else if(whiteturn){
+            itemSelected = true;
+            selectionRow = r;
+            selectionColumn = c;
+            HighlightSelection(r, c);
+            //if it is the first move of the pawn
+            if(r == 1){
+                if(piecePositions[r + 1][c] == "Empty"){
+                    HighlightMove(r + 1, c);
+                    if(piecePositions[r + 2][c] == "Empty"){
+                        HighlightMove(r + 2, c);
+                    }
+                }
+            }
+            //if it is not the first move of the pawn
+            else{
+                if(piecePositions[r + 1][c] == "Empty"){
+                    HighlightMove(r + 1, c);
+                }
+            }
+        }
+        //returns if it is not white's turn
+        return;
+    }
+
+    private void RedrawBoard(){
+
+        //clears the pane of all images
         gamePane.getChildren().clear();
 
         //redraws the black and white squares
@@ -224,15 +340,12 @@ public class ChessController implements Initializable {
             rowCount++;
         }
 
-        //loops again to redraw the pieces
+        //loops again to redraw the updated pieces
         rowCount = 0;
         while(rowCount < rowMax){
             int columnCount = 0;
             while(columnCount < columnMax){
-                if(selection && rowCount == r && columnCount == c){
-                    AddPiece(rowCount, columnCount, selectionImg);
-                }
-                else if(!(piecePositions[rowCount][columnCount].equals("Empty"))){
+                if(!(piecePositions[rowCount][columnCount].equals("Empty"))){
                     AddPiece(rowCount, columnCount, (piecePositions[rowCount][columnCount] + ".png"));
                 }
                 columnCount++;
